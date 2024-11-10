@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emlak Platformu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #333;
+            --background-color: #f4f7f6;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo img {
+            width: 60px;
+            margin-right: 15px;
+            border-radius: 50%;
+        }
+
+        .header-logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: white;
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* Kategori Tabları */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Search Container */
+        .search-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .search-form select, 
+        .search-form input, 
+        .search-form button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .search-form button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-form button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Property Grid */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+
+        .property-card-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .property-card:hover .property-card-image {
+            transform: scale(1.05);
+        }
+
+        .property-card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .property-price {
+            color: var(--secondary-color);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .property-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .property-details {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        /* Modal Styles */
+        .property-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            animation: modalSlideUp 0.4s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-details {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                grid-template-columns: 1fr;
+                max-height: none;
+            }
+
+            .category-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-logo">
+                <img src="https://via.placeholder.com/60" alt="Logo">
+                <h1>Emlak Platformu</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="#">Anasayfa</a>
+                <a href="#">İlanlar</a>
+                <a href="admin.html">Admin Panel</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="category-tabs" id="category-tabs">
+        <!-- Dinamik olarak doldurulacak -->
+    </div>
+
+    <div class="search-container">
+        <form id="property-search" class="search-form">
+            <select id="type-filter">
+                <option value="">Tür Seçin</option>
+                <option value="satilik">Satılık</option>
+                <option value="kiralik">Kiralık</option>
+            </select>
+            <select id="category-filter">
+                <option value="">Kategori Seçin</option>
+                <!-- Dinamik olarak doldurulacak -->
+            </select>
+            <select id="city-filter">
+                <option value="">Şehir Seçin</option>
+                <option value="İstanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İzmir">İzmir</option>
+            </select>
+            <input type="number" id="min-price-filter" placeholder="Min Fiyat">
+            <input type="number" id="max-price-filter" placeholder="Max Fiyat">
+            <button type="submit">
+                <i class="fas fa-search"></i> Filtrele
+            </button>
+        </form>
+    </div>
+
+    <div id="property-grid" class="property-grid">
+        <!-- Dinamik olarak doldurulacak -->
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const propertyGrid = document.getElementById('property-grid');
+            const searchForm = document.getElementById('property-search');
+            const categoryTabsContainer = document.getElementById('category-tabs');
+            const categoryFilter = document.getElementById('category-filter');
+
+            // Kategori Tablarını Oluşturma
+            function renderCategoryTabs() {
+                const categories = window.emlakYonetimi.getCategories();
+                
+                // Kategori tabları
+                categoryTabsContainer.innerHTML = categories.map(cat => `
+                    <button class="category-tab" data-category="${cat.id}">
+                        ${cat.name}
+                    </button>
+                `).join('');
+
+                // Kategori filtre seçenekleri
+                categoryFilter.innerHTML = `
+                    <option value="">Kategori Seçin</option>
+                    ${categories.map(cat => `
+                        <option value="${cat.id}">${cat.name}</option>
+                    `).join('')}
+                `;
+
+                // Kategori tab tıklama olayları
+                categoryTabsContainer.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Aktif tab stilini ayarla
+                        categoryTabsContainer.querySelectorAll('.category-tab').forEach(t => 
+                            t.classList.remove('active')
+                        );
+                        tab.classList.add('active');
+
+                        // Kategori filtrelemesi
+                        const categoryId = tab.dataset.category;
+                        const properties = window.emlakYonetimi.filterProperties({ 
+                            category: categoryId 
+                        });
+                        renderProperties(properties);
+                    });
+                });
+            }
+
+            // Özellikleri render etme
+            function renderProperties(properties) {
+                propertyGrid.innerHTML = properties.map(prop => `
+                    <div class="property-card" data-id="${prop.id}">
+                        <img src="${prop.image}" alt="${prop.title}" class="property-card-image">
+                        <div class="property-card-content">
+                            <div class="property-price">${prop.price.toLocaleString()} TL</div>
+                            <h3>${prop.title}</h3>
+                            <div class="property-details">
+                                <span>${prop.city} / ${prop.district}</span>
+                                <span>${prop.rooms} | ${prop.size} m²</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Kart tıklama eventi
+                propertyGrid.querySelectorAll('.property-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const propertyId = card.dataset.id;
+                        const property = properties.find(p => p.id == propertyId);
+                        openPropertyModal(property);
+                    });
+                });
+            }
+
+            // Modal açma fonksiyonu
+            function openPropertyModal(property) {
+                const modalHtml = `
+                    <div class="property-modal">
+                        <div class="modal-content">
+                            <button class="close-modal">&times;</button>
+                            <img src="${property.image}" alt="${property.title}" class="modal-image">
+                            <div class="modal-details">
+                                <div>
+                                    <h2 style="font-size: 24px; margin-bottom: 15px;">${property.title}</h2>
+                                    <div class="property-price" style="margin-bottom: 20px;">${property.price.toLocaleString()} TL</div>
+                                    
+                                    <div style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                        <p><strong>Kategori:</strong> ${window.emlakYonetimi.getCategoryNameById(property.category)}</p>
+                                        <p><strong>Konum:</strong> ${property.city} / ${property.district}</p>
+                                        <p><strong>Oda Sayısı:</strong> ${property.rooms}</p>
+                                        <p><strong>Metrekare:</strong> ${property.size} m²</p>
+                                        <p><strong>Bina Yaşı:</strong> ${property.age} Yıl</p>
+                                    </div>
+                                    
+                                    <p style="color: #666;">${property.description}</p>
+                                </div>
+                                
+                                <button class="contact-button" style="
+                                    background: var(--primary-color);
+                                    color: white;
+                                    border: none;
+                                    padding: 12px 20px;
+                                    border-radius: 6px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 10px;
+                                    margin-top: 20px;
+                                ">
+                                    <i class="fas fa-phone"></i> İletişime Geç
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                // Modal kapatma
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    document.querySelector('.property-modal').remove();
+                });
+
+                // Modal dışına tıklandığında kapatma
+                document.querySelector('.property-modal').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('property-modal')) {
+                        e.target.remove();
+                    }
+                });
+            }
+
+            // İlk render
+            const properties = window.emlakYonetimi.getProperties();
+            renderProperties(properties);
+            renderCategoryTabs();
+
+            // Filtreleme
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const filters = {
+                    type: document.getElementById('type-filter').value,
+                    category: document.getElementById('category-filter').value,
+                    city: document.getElementById('city-filter').value,
+                    minPrice: document.getElementById('min-price-filter').value ? 
+                        parseInt(document.getElementById('min-price-filter').value) : null,
+                    maxPrice: document.getElementById('max-price-filter').value ? 
+                        parseInt(document.getElementById('max-price-filter').value) : null
+                };
+
+                const filteredProperties = window.emlakYonetimi.filterProperties(filters);
+                renderProperties(filteredProperties);
+            });
+        });
+    </script>
+</body>
+</html>

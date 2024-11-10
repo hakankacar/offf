@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emlak Admin Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #333;
+            --background-color: #f4f7f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .property-list {
+            margin-top: 20px;
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn {
+            background-color: #f39c12;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="sidebar">
+            <h2>Admin Paneli</h2>
+            <ul class="sidebar-menu">
+                <li><a href="#" id="nav-add-property"><i class="fas fa-plus"></i> İlan Ekle</a></li>
+                <li><a href="#" id="nav-property-list"><i class="fas fa-list"></i> İlan Listesi</a></li>
+                <li><a href="index.html"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content" id="main-content">
+            <!-- İçerik dinamik olarak buraya eklenecek -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        class AdminPanel {
+            constructor() {
+                // Özellikleri ve kategorileri al
+                this.properties = window.emlakYonetimi.getProperties();
+                this.categories = window.emlakYonetimi.getCategories();
+                
+                // Event listener'ları başlat
+                this.initEventListeners();
+                
+                // İlk sayfayı yükle
+                this.renderAddPropertyForm();
+            }
+
+            initEventListeners() {
+                document.getElementById('nav-add-property').addEventListener('click', () => this.renderAddPropertyForm());
+                document.getElementById('nav-property-list').addEventListener('click', () => this.renderPropertyList());
+            }
+
+            renderAddPropertyForm() {
+                const mainContent = document.getElementById('main-content');
+                mainContent.innerHTML = `
+                    <h2>Yeni İlan Ekle</h2>
+                    <form id="add-property-form">
+                        <div class="form-group">
+                            <label>Başlık</label>
+                            <input type="text" id="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fiyat</label>
+                            <input type="number" id="price" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tür</label>
+                            <select id="type" required>
+                                <option value="satilik">Satılık</option>
+                                <option value="kiralik">Kiralık</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori</label>
+                            <select id="category" required>
+                                ${this.categories.map(cat => `
+                                    <option value="${cat.id}">${cat.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Şehir</label>
+                            <select id="city" required>
+                                <option value="İstanbul">İstanbul</option>
+                                <option value="Ankara">Ankara</option>
+                                <option value="İzmir">İzmir</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>İlçe</label>
+                            <input type="text" id="district" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Oda Sayısı</label>
+                            <select id="rooms" required>
+                                <option value="1+1">1+1</option>
+                                <option value="2+1">2+1</option>
+                                <option value="3+1">3+1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Metrekare</label>
+                            <input type="number" id="size" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bina Yaşı</label>
+                            <input type="number" id="age" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea id="description" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Resim URL</label>
+                            <input type="text" id="image" required>
+                        </div>
+                        <button type="submit" class="btn">İlan Ekle</button>
+                    </form>
+                `;
+
+                document.getElementById('add-property-form').addEventListener('submit', this.handlePropertyAdd.bind(this));
+            }
+
+            handlePropertyAdd(e) {
+                e.preventDefault();
+                const newProperty = {
+                    title: document.getElementById('title').value,
+                    price: parseFloat(document.getElementById('price').value),
+                    type: document.getElementById('type').value,
+                    category: document.getElementById('category').value,
+                    city: document.getElementById('city').value,
+                    district: document.getElementById('district').value,
+                    rooms: document.getElementById('rooms').value,
+                    size: parseFloat(document.getElementById('size').value),
+                    age: parseInt(document.getElementById('age').value),
+                    description: document.getElementById('description').value,
+                    image: document.getElementById('image').value
+                };
+
+                // Özelliği ekle
+                window.emlakYonetimi.addProperty(newProperty);
+                
+                // Özellikleri güncelle
+                this.properties = window.emlakYonetimi.getProperties();
+                
+                // İlan listesini göster
+                this.renderPropertyList();
+                
+                // Formu sıfırla
+                e.target.reset();
+            }
+
+            renderPropertyList() {
+                const mainContent = document.getElementById('main-content');
+                mainContent.innerHTML = `
+                    <h2>İlan Listesi</h2>
+                    <div class="property-list">
+                        ${this.properties.map(prop => `
+                            <div class="property-item">
+                                <span>${prop.title} - ${prop.price.toLocaleString()} TL</span>
+                                <div class="property-actions">
+                                    <button class="btn edit-btn" data-id="${prop.id}">Düzenle</button>
+                                    <button class="btn delete-btn" data-id="${prop.id}">Sil</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Düzenleme ve Silme Event Listener'ları
+                mainContent.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('edit-btn')) {
+                        this.openEditModal(e.target.dataset.id);
+                    } else if (e.target.classList.contains('delete-btn')) {
+                        this.deleteProperty(e.target.dataset.id);
+                    }
+                });
+            }
+
+            openEditModal(id) {
+                const property = this.properties.find(p => p.id == id);
+                if (!property) return;
+
+                const mainContent = document.getElementById('main-content');
+                mainContent.innerHTML = `
+                    <h2>İlanı Düzenle</h2>
+                    <form id="edit-property-form">
+                        <input type="hidden" id="edit-id" value="${property.id}">
+                        <div class="form-group">
+                            <label>Başlık</label>
+                            <input type="text" id="edit-title" value="${property.title}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fiyat</label>
+                            <input type="number" id="edit-price" value="${property.price}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tür</label>
+                            <select id="edit-type" required>
+                                <option value="satilik" ${property.type === 'satilik' ? 'selected' : ''}>Satılık</option>
+                                <option value="kiralik" ${property.type === 'kiralik' ? 'selected' : ''}>Kiralık</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori</label>
+                            <select id="edit-category" required>
+                                ${this.categories.map(cat => `
+                                    <option value="${cat.id}" ${property.category == cat.id ? 'selected' : ''}>${cat.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Şehir</label>
+                            <select id="edit-city" required>
+                                <option value="İstanbul" ${property.city === 'İstanbul' ? 'selected' : ''}>İstanbul</option>
+                                <option value="Ankara" ${property.city === 'Ankara' ? 'selected' : ''}>Ankara</option>
+                                <option value="İzmir" ${property.city === 'İzmir' ? 'selected' : ''}>İzmir</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>İlçe</label>
+                            <input type="text" id="edit-district" value="${property.district}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Oda Sayısı</label>
+                            <select id="edit-rooms" required>
+                                <option value="1+1" ${property.rooms === '1+1' ? 'selected' : ''}>1+1</option>
+                                <option value="2+1" ${property.rooms === '2+1' ? 'selected' : ''}>2+1</option>
+                                <option value="3+1" ${property.rooms === '3+1' ? 'selected' : ''}>3+1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Metrekare</label>
+                            <input type="number" id="edit-size" value="${property.size}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bina Yaşı</label>
+                            <input type="number" id="edit-age" value="${property.age}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea id="edit-description" rows="4" required>${property.description}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Resim URL</label>
+                            <input type="text" id="edit-image" value="${property.image}" required>
+                        </div>
+                        <button type="submit" class="btn">Güncelle</button>
+                        <button type="button" class="btn" id="cancel-edit">İptal</button>
+                    </form>
+                `;
+
+                document.getElementById('edit-property-form').addEventListener('submit', this.handlePropertyEdit.bind(this));
+                document.getElementById('cancel-edit').addEventListener('click', () => this.renderPropertyList());
+            }
+
+            handlePropertyEdit(e) {
+                e.preventDefault();
+                const id = document.getElementById('edit-id').value;
+                const index = this.properties.findIndex(p => p.id == id);
+
+                if (index !== -1) {
+                    // Güncellenmiş özellik bilgileri
+                    const updatedProperty = {
+                        id: parseInt(id),
+                        title: document.getElementById('edit-title').value,
+                        price: parseFloat(document.getElementById('edit-price').value),
+                        type: document.getElementById('edit-type').value,
+                        category: document.getElementById('edit-category').value,
+                        city: document.getElementById('edit-city').value,
+                        district: document.getElementById('edit-district').value,
+                        rooms: document.getElementById('edit-rooms').value,
+                        size: parseFloat(document.getElementById('edit-size').value),
+                        age: parseInt(document.getElementById('edit-age').value),
+                        description: document.getElementById('edit-description').value,
+                        image: document.getElementById('edit-image').value
+                    };
+
+                    // Özellikleri güncelle
+                    this.properties[index] = updatedProperty;
+                    
+                    // LocalStorage'ı güncelle
+                    window.emlakYonetimi.saveProperties(this.properties);
+                    
+                    // İlan listesini yeniden render et
+                    this.renderPropertyList();
+                }
+            }
+
+            deleteProperty(id) {
+                if (confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
+                    // Özelliği filtrele
+                    this.properties = this.properties.filter(p => p.id != id);
+                    
+                    // LocalStorage'ı güncelle
+                    window.emlakYonetimi.saveProperties(this.properties);
+                    
+                    // İlan listesini yeniden render et
+                    this.renderPropertyList();
+                }
+            }
+        }
+
+        // Admin Panelini Başlat
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdminPanel();
+        });
+    </script>
+</body>
+</html>
